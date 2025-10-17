@@ -77,21 +77,24 @@ class _HomePageState extends State<HomePage>
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.orange.shade100,
+                color: Colors.green.shade100,
                 border: Border(
-                  bottom: BorderSide(color: Colors.orange.shade300),
+                  bottom: BorderSide(color: Colors.green.shade300),
                 ),
               ),
               child: Row(
                 children: [
-                  Icon(Icons.warning, color: Colors.orange.shade700, size: 20),
+                  Icon(
+                    Icons.gpp_good_outlined,
+                    color: Colors.green.shade700,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
-                    // TODO: haysh de yasta lma t5las
                     child: Text(
-                      'Current Widget: ${_getWidgetName(_currentIndex)} - Contains bugs that need fixing!',
+                      'Current Widget: ${_getWidgetName(_currentIndex)} - not Contains bugs all fixing!',
                       style: TextStyle(
-                        color: Colors.orange.shade800,
+                        color: Colors.green.shade600,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
@@ -123,21 +126,7 @@ class _HomePageState extends State<HomePage>
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.info_outline, color: Colors.blue.shade700, size: 16),
-                const SizedBox(width: 8),
-                Text(
-                  // TODO: Haesh de kamman y3m
-                  'Find and fix the bugs in each widget!',
-                  style: TextStyle(
-                    color: Colors.blue.shade700,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
+            Row(mainAxisAlignment: MainAxisAlignment.center),
             const SizedBox(height: 4),
             Text(
               'Switch between tabs to test different widgets',
