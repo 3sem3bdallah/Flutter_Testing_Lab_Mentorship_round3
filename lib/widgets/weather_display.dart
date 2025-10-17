@@ -16,12 +16,13 @@ class _WeatherDisplayState extends State<WeatherDisplay> {
 
   final List<String> _cities = ['New York', 'London', 'Tokyo', 'Invalid City'];
 
+  // FIX 1: Corrected temperature conversion formulas
   double celsiusToFahrenheit(double celsius) {
-    return celsius * 9 / 5;
+    return celsius * 9 / 5 + 32; // Added + 32
   }
 
   double fahrenheitToCelsius(double fahrenheit) {
-    return fahrenheit - 32 * 5 / 9;
+    return (fahrenheit - 32) * 5 / 9; // Fixed operator precedence
   }
 
   // Simulate API call that sometimes returns null or malformed data
@@ -32,7 +33,7 @@ class _WeatherDisplayState extends State<WeatherDisplay> {
       return null;
     }
 
-    
+    // Sometimes returns incomplete data (missing fields)
     if (DateTime.now().millisecond % 4 == 0) {
       return {'city': city, 'temperature': 22.5}; 
     }
@@ -49,20 +50,48 @@ class _WeatherDisplayState extends State<WeatherDisplay> {
     };
   }
 
+  // FIX 2 & 3: Added proper error handling and null safety
   Future<void> _loadWeather() async {
-    if (mounted) {
+    if (!mounted) return;
+    
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final data = await _fetchWeatherData(_selectedCity);
+      
+      if (!mounted) return;
+      
+      // Check if data is null
+      if (data == null) {
+        setState(() {
+          _error = 'Failed to fetch weather data for $_selectedCity';
+          _isLoading = false;
+          _weatherData = null;
+        });
+        return;
+      }
+
+      // Try to parse the data
+      final weatherData = WeatherData.fromJson(data);
+      
       setState(() {
-        _isLoading = true;
+        _weatherData = weatherData;
+        _isLoading = false;
         _error = null;
       });
+    } catch (e) {
+      // Handle parsing errors
+      if (!mounted) return;
+      
+      setState(() {
+        _error = 'Error processing weather data: ${e.toString()}';
+        _isLoading = false;
+        _weatherData = null;
+      });
     }
-
-    
-    final data = await _fetchWeatherData(_selectedCity);
-    setState(() {
-      _weatherData = WeatherData.fromJson(data); 
-      _isLoading = false;
-    });
   }
 
   @override
@@ -127,9 +156,42 @@ class _WeatherDisplayState extends State<WeatherDisplay> {
           ),
           const SizedBox(height: 16),
 
-          if (_isLoading && _error == null)
+          // FIX 4: Fixed loading state logic
+          if (_isLoading)
             const Center(child: CircularProgressIndicator())
-          
+          // FIX 5: Added error display
+          else if (_error != null)
+            Card(
+              color: Colors.red.shade50,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.red.shade700, size: 48),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Error',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.red.shade700,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      _error!,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Colors.red.shade700),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: _loadWeather,
+                      child: const Text('Try Again'),
+                    ),
+                  ],
+                ),
+              ),
+            )
           else if (_weatherData != null)
             Card(
               elevation: 4,
@@ -200,7 +262,6 @@ class _WeatherDisplayState extends State<WeatherDisplay> {
                 ),
               ),
             )
-          
         ],
       ),
     );
@@ -238,15 +299,24 @@ class WeatherData {
     required this.icon,
   });
 
-  
+  // FIX 3: Added null safety checks and default values
   factory WeatherData.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      throw ArgumentError('Weather data cannot be null');
+    }
+
+    // Validate required fields
+    if (!json.containsKey('city') || !json.containsKey('temperature')) {
+      throw ArgumentError('Missing required fields: city and temperature');
+    }
+
     return WeatherData(
-      city: json!['city'],
-      temperatureCelsius: json['temperature'].toDouble(),
-      description: json['description'],
-      humidity: json['humidity'], 
-      windSpeed: json['windSpeed'].toDouble(), 
-      icon: json['icon'], 
+      city: json['city'] as String,
+      temperatureCelsius: (json['temperature'] as num).toDouble(),
+      description: json['description'] as String? ?? 'No description',
+      humidity: json['humidity'] as int? ?? 0,
+      windSpeed: (json['windSpeed'] as num?)?.toDouble() ?? 0.0,
+      icon: json['icon'] as String? ?? '🌡️',
     );
   }
 }
