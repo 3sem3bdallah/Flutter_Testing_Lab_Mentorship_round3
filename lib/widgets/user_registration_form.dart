@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_testing_lab/helper/validate_helper.dart';
+
+import '../helper/validate_helper.dart';
 
 class UserRegistrationForm extends StatefulWidget {
   const UserRegistrationForm({super.key});
