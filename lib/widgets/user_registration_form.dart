@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_testing_lab/helper/validate_helper.dart';
 
 class UserRegistrationForm extends StatefulWidget {
   const UserRegistrationForm({super.key});
@@ -13,31 +14,28 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _nameController = TextEditingController();
-
+  bool autoValidate = false;
   bool _isLoading = false;
   String _message = '';
-
-  bool isValidEmail(String email) {
-    return email.contains('@');
-  }
-
-  bool isValidPassword(String password) {
-    return true;
-  }
-
   Future<void> _submitForm() async {
-    setState(() {
-      _isLoading = true;
-      _message = '';
-    });
+    if (_formKey.currentState?.validate() ?? false) {
+      setState(() {
+        _isLoading = true;
+        _message = '';
+      });
 
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 2));
 
-    setState(() {
-      _isLoading = false;
-      _message = 'Registration successful!';
-    });
+      setState(() {
+        _isLoading = false;
+        _message = 'Registration successful!';
+      });
+    } else {
+      setState(() {
+        autoValidate = true;
+        _message = '';
+      });
+    }
   }
 
   @override
@@ -46,6 +44,9 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
       padding: const EdgeInsets.all(16.0),
       child: Form(
         key: _formKey,
+        autovalidateMode: autoValidate
+            ? AutovalidateMode.always
+            : AutovalidateMode.disabled,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -55,16 +56,9 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
                 labelText: 'Full Name',
                 border: OutlineInputBorder(),
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your full name';
-                }
-                if (value.length < 2) {
-                  return 'Name must be at least 2 characters';
-                }
-                return null;
-              },
+              validator: (v) => ValidateHelper.validateFullName(v),
             ),
+
             const SizedBox(height: 16),
             TextFormField(
               controller: _emailController,
@@ -73,15 +67,7 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.emailAddress,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your email';
-                }
-                if (!isValidEmail(value)) {
-                  return 'Please enter a valid email';
-                }
-                return null;
-              },
+              validator: (v) => ValidateHelper.validateEmail(v),
             ),
             const SizedBox(height: 16),
             TextFormField(
@@ -92,15 +78,7 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
                 helperText: 'At least 8 characters with numbers and symbols',
               ),
               obscureText: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a password';
-                }
-                if (!isValidPassword(value)) {
-                  return 'Password is too weak';
-                }
-                return null;
-              },
+              validator: (v) => ValidateHelper.validatePassword(v!),
             ),
             const SizedBox(height: 16),
             TextFormField(
@@ -110,15 +88,10 @@ class _UserRegistrationFormState extends State<UserRegistrationForm> {
                 border: OutlineInputBorder(),
               ),
               obscureText: true,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please confirm your password';
-                }
-                if (value != _passwordController.text) {
-                  return 'Passwords do not match';
-                }
-                return null;
-              },
+              validator: (v) => ValidateHelper.validateConfPassword(
+                confPassword: _confirmPasswordController.text,
+                newPassword: _passwordController.text,
+              ),
             ),
             const SizedBox(height: 24),
             ElevatedButton(

@@ -10,7 +10,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _currentIndex = 0;
 
@@ -67,10 +68,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              Colors.grey.shade50,
-              Colors.grey.shade100,
-            ],
+            colors: [Colors.grey.shade50, Colors.grey.shade100],
           ),
         ),
         child: Column(
@@ -86,13 +84,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               ),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.warning,
-                    color: Colors.orange.shade700,
-                    size: 20,
-                  ),
+                  Icon(Icons.warning, color: Colors.orange.shade700, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
+                    // TODO: haysh de yasta lma t5las
                     child: Text(
                       'Current Widget: ${_getWidgetName(_currentIndex)} - Contains bugs that need fixing!',
                       style: TextStyle(
@@ -123,9 +118,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.blue.shade50,
-          border: Border(
-            top: BorderSide(color: Colors.blue.shade200),
-          ),
+          border: Border(top: BorderSide(color: Colors.blue.shade200)),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -136,6 +129,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 Icon(Icons.info_outline, color: Colors.blue.shade700, size: 16),
                 const SizedBox(width: 8),
                 Text(
+                  // TODO: Haesh de kamman y3m
                   'Find and fix the bugs in each widget!',
                   style: TextStyle(
                     color: Colors.blue.shade700,
@@ -147,10 +141,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             const SizedBox(height: 4),
             Text(
               'Switch between tabs to test different widgets',
-              style: TextStyle(
-                color: Colors.blue.shade600,
-                fontSize: 12,
-              ),
+              style: TextStyle(color: Colors.blue.shade600, fontSize: 12),
             ),
           ],
         ),
